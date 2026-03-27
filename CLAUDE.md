@@ -81,9 +81,9 @@ DELETE /api/admin/products/:id
 
 ---
 
-## Production Build & Run
+## Production Build & Run (Local)
 
-The app runs as a **single process** — Express serves both the API and the compiled React frontend.
+The app runs as a **single process** locally — Express serves both the API and the compiled React frontend.
 
 ### First-time or after frontend code changes
 ```bash
@@ -100,10 +100,10 @@ npm start
 Open **http://localhost:3001** — everything served from one port.
 
 ### How it works
-- `backend/server.js` serves `frontend/dist` as static files
+- `backend/server.js` serves `frontend/dist` as static files (only if dist exists)
 - All `/api/*` routes are handled by Express
 - All other routes fall back to `index.html` (React Router SPA)
-- `frontend/src/api/api.js` uses `baseURL: '/api'` (relative, no hardcoded port)
+- `frontend/src/api/api.js` uses `VITE_API_URL` env var, falls back to `/api` for local dev
 
 ### After any frontend change — rebuild before testing
 ```bash
@@ -111,6 +111,39 @@ cd frontend && npm run build
 # then restart backend
 cd ../backend && npm start
 ```
+
+---
+
+## Deployment (Production)
+
+**Architecture:** Frontend (Vercel) + Backend (Railway) — separate services.
+
+| Platform | Service | URL |
+|----------|---------|-----|
+| Vercel   | Frontend — React static build | https://ecommercetrial-nu.vercel.app |
+| Railway  | Backend — Express + SQLite    | https://ecommercetrial-production.up.railway.app |
+
+### Railway (Backend) env vars
+```
+JWT_SECRET=<random 32-byte hex string>
+CORS_ORIGIN=https://your-vercel-url.vercel.app   # no trailing slash!
+```
+> PORT is set automatically by Railway — do not set manually.
+
+### Vercel (Frontend) env vars
+```
+VITE_API_URL=https://your-railway-url.up.railway.app/api
+```
+> Set Root Directory to `frontend` when importing the repo on Vercel.
+
+### Re-deploy flow
+- **Backend change** → push to master → Railway auto-redeploys
+- **Frontend change** → push to master → Vercel auto-redeploys (runs `npm run build`)
+
+### Gotchas
+- `CORS_ORIGIN` must NOT have a trailing slash — browser origin never has one
+- `frontend/dist` is gitignored — Railway (backend-only) will not serve static files, which is correct
+- `nixpacks.toml` in root tells Railway to use Node.js 20 and run from `/backend`
 
 ---
 

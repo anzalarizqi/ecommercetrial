@@ -1,5 +1,6 @@
 # STATUS.md — E-Commerce Project
 > Update terakhir: 2026-03-27
+> **🎉 PROJECT SELESAI & LIVE** — 54/54 test PASS, deployed ke Vercel + Railway
 
 ## Legend
 - `TODO` — belum dimulai
@@ -44,6 +45,20 @@
 | QA-02 | Test Backend API            | DONE        | PASS 20/20 tests — 2026-03-26 |
 | QA-03 | Test Frontend komponen      | DONE        | PASS 25/25 — 2026-03-26. 2 bug ditemukan (lihat Bug Tracker) |
 | QA-04 | Integration test full flow  | DONE        | PASS 9/9 — 2026-03-27. 34/34 total test PASS |
+
+## Deployment
+
+| Platform | Service | URL | Status |
+|----------|---------|-----|--------|
+| Railway  | Backend (Express + SQLite) | https://ecommercetrial-production.up.railway.app | LIVE ✅ |
+| Vercel   | Frontend (React)           | https://ecommercetrial-nu.vercel.app             | LIVE ✅ |
+
+### Env vars Railway
+- `JWT_SECRET` — set ✅
+- `CORS_ORIGIN` = `https://ecommercetrial-nu.vercel.app` ✅
+
+### Env vars Vercel
+- `VITE_API_URL` = `https://ecommercetrial-production.up.railway.app/api` ✅
 
 ---
 
