@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+tests/node_modules/
+
+# Build output
+frontend/dist/
+
+# Environment
+.env
+backend/.env
+
+# Database
+*.db
+backend/*.db
+backend/db/*.db
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
+
+# SQLite WAL files
+*.db-shm
+*.db-wal

@@ -81,6 +81,39 @@ DELETE /api/admin/products/:id
 
 ---
 
+## Production Build & Run
+
+The app runs as a **single process** — Express serves both the API and the compiled React frontend.
+
+### First-time or after frontend code changes
+```bash
+cd frontend
+npm run build
+```
+This compiles React into `frontend/dist/`.
+
+### Run the app
+```bash
+cd backend
+npm start
+```
+Open **http://localhost:3001** — everything served from one port.
+
+### How it works
+- `backend/server.js` serves `frontend/dist` as static files
+- All `/api/*` routes are handled by Express
+- All other routes fall back to `index.html` (React Router SPA)
+- `frontend/src/api/api.js` uses `baseURL: '/api'` (relative, no hardcoded port)
+
+### After any frontend change — rebuild before testing
+```bash
+cd frontend && npm run build
+# then restart backend
+cd ../backend && npm start
+```
+
+---
+
 ## Worker Rules
 
 - Each worker stays in its own directory and does not modify files outside it.
@@ -91,6 +124,7 @@ DELETE /api/admin/products/:id
 
 ## Supervisor Rules
 
+- **At session start, read STATUS.md first** to understand what's already DONE — do not re-assign completed tasks.
 - Supervisor reads PRD and evaluates whether multi-agent is worth it before assigning tasks.
 - Loop: `check_messages → process reports → update STATUS.md → assign next task → repeat`
 - Never assign a task whose dependencies are not yet complete.
