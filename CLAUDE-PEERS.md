@@ -46,9 +46,31 @@ cd ~/claude-peers-mcp && bun install
 ```bash
 claude mcp add --scope user --transport stdio claude-peers -- bun ~/claude-peers-mcp/server.ts
 
-# Verifikasi — harus muncul "claude-peers"
+# Verifikasi — harus muncul "claude-peers" dengan status ✓ Connected
 claude mcp list
 ```
+
+### Windows fix (Git Bash / PowerShell)
+
+Jika `claude mcp list` menampilkan `claude-peers: ✗ Failed to connect`, itu bug path Bun di Windows.
+Perbaiki di baris 41 `~/claude-peers-mcp/server.ts`:
+
+```ts
+// Sebelum:
+const BROKER_SCRIPT = new URL("./broker.ts", import.meta.url).pathname;
+// Sesudah:
+const BROKER_SCRIPT = new URL("./broker.ts", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1");
+```
+
+Lalu re-register dengan full Windows path:
+```bash
+claude mcp remove claude-peers
+claude mcp add --scope user --transport stdio claude-peers -- bun C:/Users/<kamu>/claude-peers-mcp/server.ts
+```
+
+> **Terminal recommendation:** Gunakan **PowerShell** di Windows, bukan Git Bash.
+> Git Bash tidak support Ctrl+C/V — menyusahkan saat paste prompt panjang.
+> PowerShell pakai Windows-style path: `cd C:\Users\anzal\dev\myproject`
 
 ## 4. Buat alias
 
@@ -151,11 +173,26 @@ Cara kerja setup ini:
      (Integrasi perlu agent tersendiri jika: menyentuh banyak direktori sekaligus,
      butuh koordinasi aktif antar hasil kerja beberapa worker, atau berisiko conflict tinggi.)
    - Apakah perlu QA Agent, atau cukup worker yang self-test?
+   - Apakah perlu DevOps Agent untuk CI/CD, Docker, atau deployment pipeline?
 
-4. Buat 3 file berikut — isi sepenuhnya berdasarkan pemahamanmu terhadap PRD:
+   **Agent merging:** Jika project kecil atau scope tidak justify pemisahan,
+   gabungkan agent. Contoh: Backend+QA jadi satu agent, atau Frontend+QA merged.
+   Lebih sedikit agent = lebih sedikit token burn dan koordinasi overhead.
+
+   **Agent roster yang tersedia:**
+   | Tipe | Dir default | Gunakan jika |
+   |---|---|---|
+   | Frontend | `/frontend` | Ada UI |
+   | Backend | `/backend` | Ada server/API/DB |
+   | QA | `/tests` | Project medium+ complexity |
+   | DevOps | `/` | Ada kebutuhan deploy pipeline / infra |
+   | Supervisor | `/` | Selalu |
+
+4. Buat 4 file berikut — isi sepenuhnya berdasarkan pemahamanmu terhadap PRD:
    - TASKS.md  : breakdown task per agent dengan kode unik dan dependency antar task yang eksplisit.
    - STATUS.md : tracking progress semua task, format yang mudah dibaca sekilas.
    - AGENTS.md : akan kamu isi dengan peer ID tiap agent setelah list_peers berhasil.
+   - RESUME.md : kosong dulu — kamu isi sebelum context limit habis (lihat format di bawah).
 
 5. Jalankan list_peers. Jika belum semua worker muncul, tunggu 15 detik dan coba lagi.
    Catat peer ID tiap agent ke AGENTS.md.
@@ -180,9 +217,34 @@ Prinsip koordinasi:
 - Kamu yang memutuskan urutan, prioritas, dan siapa mengerjakan apa — bukan user.
 - Ambil keputusan teknis sendiri. Lapor ke user hanya untuk keputusan di luar kapasitasmu.
 - Jangan assign task yang dependency-nya belum selesai.
+- **Eksploitasi parallelism secara agresif**: assign task Frontend mock-first selagi Backend masih
+  dibangun. Jangan serialize pekerjaan yang bisa berjalan paralel.
+- QA di-assign task **paralel dengan development** — jangan tunggu semua fitur selesai.
 - Jika ada bug dari QA, forward ke agent terkait dan track di STATUS.md.
 - Jika ada conflict antar hasil kerja worker (misal file yang overlap), kamu yang resolve
   atau assign ke agent yang paling tepat untuk fix.
+- **Pantau penggunaan context sendiri.** Saat mendekati limit, tulis RESUME.md SEBELUM berhenti:
+
+Format RESUME.md:
+---
+# RESUME.md — Snapshot <YYYY-MM-DD>
+
+## Tasks DONE
+- BE-01, BE-02, FE-01, ...
+
+## Tasks IN_PROGRESS
+- QA-03 (QA agent) — sudah tulis 8/15 test, belum cover cart dan checkout
+
+## Tasks TODO
+- QA-04, FE-07, ...
+
+## Blockers
+- Tidak ada / <deskripsi jika ada>
+
+## Next action (hal pertama yang Supervisor lakukan di sesi berikutnya)
+- Re-assign QA-03 ke QA agent. Context: test ada di /tests/api.test.js, lanjut dari baris 87.
+---
+
 - Jangan berhenti sampai semua task DONE.
 ```
 
@@ -204,11 +266,12 @@ Aturan:
 - Kerjakan hanya task yang di-assign Supervisor.
 - Fokus di direktori kerjamu saja. Jangan ubah file di luar direktori itu.
 - Setiap selesai task: update STATUS.md dan lapor ke Supervisor.
+- **Laporan harus singkat — maksimal 2 baris.** Jangan summary panjang. Supervisor bisa baca kode.
 - Ada pertanyaan ke agent lain? Kirim via send_message langsung.
 - Ada blocker? Lapor Supervisor segera — jangan diam.
 
 Format laporan selesai:
-"[[NAMA ROLE]] Task '[kode task]' selesai. [Informasi relevan, misal: file diubah / endpoint aktif]. Siap task berikutnya."
+"[[NAMA ROLE]] Task '[kode task]' selesai. [1 baris info relevan]. Siap task berikutnya."
 
 Format laporan blocker:
 "[[NAMA ROLE] BLOCKER] Task '[kode task]' terhenti. Masalah: [deskripsi]. Butuh: [apa]."
@@ -232,9 +295,11 @@ Direktori kerjamu: ./frontend
 Aturan:
 - Kerjakan hanya task yang di-assign Supervisor.
 - Fokus di /frontend saja.
-- Setiap selesai task: update STATUS.md dan lapor ke Supervisor.
+- Setiap selesai task: update STATUS.md dan lapor ke Supervisor. Laporan maksimal 2 baris.
 - Butuh info API? Tanya agent Backend via send_message.
 - Ada blocker? Lapor Supervisor segera.
+- **Selalu gunakan skill /frontend-design saat membangun komponen atau halaman UI.**
+  Jangan tulis UI generik. Hasilkan desain yang polished dan production-grade.
 
 Format laporan selesai:
 "[FRONTEND] Task 'FE-XX' selesai. File: <list>. Siap task berikutnya."
@@ -318,6 +383,23 @@ Ketik langsung di terminal Supervisor. Dia akan proses dan teruskan ke workers k
 
 **Project selesai tapi mau iterasi:**
 Ketik di terminal Supervisor: "Ada fitur baru: [deskripsi]." Dia akan update TASKS.md dan assign ke worker yang tepat.
+
+**Context limit habis di tengah sesi:**
+Kalau sudah terlanjur habis, buka sesi baru dan paste prompt Supervisor dengan tambahan:
+"Baca RESUME.md dulu sebelum apapun." Supervisor akan resume dari titik terakhir.
+Kalau RESUME.md belum sempat ditulis — baca STATUS.md, identifikasi task IN_PROGRESS,
+lalu re-assign ke worker yang bersangkutan dengan context singkat tentang progress terakhir.
+
+**Token burn terlalu tinggi (multi-agent ~3x lebih boros dari single agent):**
+- Enforce laporan worker 1-2 baris saja. Laporan panjang = pemborosan terbesar.
+- Matikan terminal agent yang domain-nya sudah 100% DONE.
+- Assign 2-3 task sekaligus ke worker, jangan satu per satu.
+- Supervisor check_messages reaktif — jangan loop ketat tanpa alasan.
+- Tulis RESUME.md lebih awal, saat context masih ~70% — jangan tunggu kritis.
+
+**claude-peers: ✗ Failed to connect di Windows:**
+Lihat bagian Windows fix di atas. Penyebab: Bun menghasilkan path `/C:/...` (dengan leading slash)
+yang tidak valid di Windows. Fix satu baris di server.ts menyelesaikan ini.
 
 ---
 

@@ -11,11 +11,11 @@ Simple e-commerce website (product listing, cart, checkout, admin panel) built w
 - Backend: Node.js + Express + SQLite + JWT (`/backend`)
 - Tests: Jest (`/tests`)
 
+> See `CLAUDE-PEERS.md` for the full reusable multi-agent framework guide.
+
 ---
 
 ## Multi-Agent Setup
-
-This project runs with **4 terminals**. Workers must be spawned before the Supervisor.
 
 ### One-time machine setup
 ```bash
@@ -78,6 +78,7 @@ DELETE /api/admin/products/:id
 - `TASKS.md` — task breakdown with unique codes and dependencies
 - `STATUS.md` — progress tracking for all tasks
 - `AGENTS.md` — peer IDs for each agent (populated after `list_peers`)
+- `RESUME.md` — written by Supervisor before hitting context limit to enable cold resume next session
 
 ---
 
