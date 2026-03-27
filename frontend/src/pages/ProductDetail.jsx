@@ -18,7 +18,7 @@ function ProductDetail() {
       setError(null)
       try {
         const res = await getProductById(id)
-        setProduct(res.data)
+        setProduct(res.data.data)
       } catch (err) {
         if (err.response?.status === 404) {
           setError('Produk tidak ditemukan.')
@@ -40,51 +40,91 @@ function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-500 mt-3">Memuat produk...</p>
+      <div className="min-h-[65vh] flex flex-col items-center justify-center gap-4">
+        <div className="w-7 h-7 border-2 border-[#C17D3A] border-t-transparent rounded-full animate-spin" />
+        <p className="text-[#7A7063] text-sm">Memuat produk...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-red-500 text-lg mb-4">{error}</p>
-        <Link to="/" className="text-indigo-600 hover:underline">← Kembali ke Produk</Link>
+      <div className="min-h-[65vh] flex flex-col items-center justify-center gap-5">
+        <p className="font-display text-3xl text-[#7A7063] font-light italic">{error}</p>
+        <Link to="/" className="text-sm text-[#C17D3A] hover:underline underline-offset-4">
+          ← Kembali ke Produk
+        </Link>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <Link to="/" className="text-indigo-600 hover:underline text-sm mb-6 inline-block">← Kembali ke Produk</Link>
+    <div className="min-h-screen bg-[#FDFAF5]">
+      <div className="max-w-5xl mx-auto px-6 py-10">
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col sm:flex-row">
-        <div className="bg-gray-100 flex items-center justify-center text-8xl sm:w-72 aspect-square sm:aspect-auto">
-          🛍️
-        </div>
-        <div className="p-6 flex flex-col flex-1">
-          <span className="text-xs text-indigo-500 font-medium mb-2">{product.category}</span>
-          <h1 className="text-2xl font-bold text-gray-800 mb-3">{product.name}</h1>
-          <p className="text-gray-500 text-sm mb-4">{product.description}</p>
-          <p className="text-3xl font-bold text-indigo-600 mb-2">{formatRupiah(product.price)}</p>
-          <p className={`text-sm mb-6 ${product.stock === 0 ? 'text-red-400 font-medium' : 'text-gray-400'}`}>
-            {product.stock === 0 ? 'Stok habis' : `Stok tersedia: ${product.stock}`}
-          </p>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.stock === 0}
-            className={`py-3 px-6 rounded-lg font-semibold transition-colors ${
-              added
-                ? 'bg-green-500 text-white'
+        {/* Back link */}
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-[#7A7063] hover:text-[#C17D3A] transition-colors mb-10 group"
+        >
+          <span className="transition-transform group-hover:-translate-x-1">←</span>
+          Kembali ke Produk
+        </Link>
+
+        {/* Main content */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 animate-fade-up" style={{ opacity: 0 }}>
+
+          {/* Image */}
+          <div className="product-image-bg rounded-3xl aspect-square flex items-center justify-center">
+            <span className="text-9xl relative z-10" style={{ opacity: 0.45 }}>🛍️</span>
+          </div>
+
+          {/* Info */}
+          <div className="flex flex-col justify-center gap-6">
+            <div>
+              <span className="text-xs uppercase tracking-[0.22em] text-[#C17D3A] font-semibold">
+                {product.category}
+              </span>
+              <h1 className="font-display text-4xl sm:text-5xl font-semibold text-[#1C1A16] mt-2 leading-tight">
+                {product.name}
+              </h1>
+            </div>
+
+            {product.description && (
+              <p className="text-[#7A7063] text-sm leading-relaxed">
+                {product.description}
+              </p>
+            )}
+
+            <div className="h-px bg-[#E8E0D4]" />
+
+            <div>
+              <p className="font-display text-4xl font-semibold text-[#C17D3A]">
+                {formatRupiah(product.price)}
+              </p>
+              <p className={`text-sm mt-2 font-medium ${product.stock === 0 ? 'text-red-400' : 'text-[#7A7063]'}`}>
+                {product.stock === 0 ? 'Stok habis' : `${product.stock} unit tersedia`}
+              </p>
+            </div>
+
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              className={`w-full py-4 rounded-2xl font-medium text-sm tracking-widest uppercase transition-all duration-300 ${
+                added
+                  ? 'bg-[#2E7D32] text-white'
+                  : product.stock === 0
+                  ? 'bg-[#E8E0D4] text-[#7A7063] cursor-not-allowed'
+                  : 'bg-[#C17D3A] hover:bg-[#9E6228] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+              }`}
+            >
+              {added
+                ? '✓ Ditambahkan!'
                 : product.stock === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-            }`}
-          >
-            {added ? '✓ Ditambahkan!' : product.stock === 0 ? 'Stok Habis' : 'Add to Cart'}
-          </button>
+                ? 'Stok Habis'
+                : 'Tambah ke Keranjang'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -14,15 +14,19 @@ const EMPTY_FORM = {
 
 function SuccessModal({ orderId, onClose }) {
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm text-center p-8">
-        <div className="text-6xl mb-4">✅</div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Berhasil!</h2>
-        <p className="text-gray-500 mb-1">Terima kasih atas pesanan Anda.</p>
-        <p className="text-indigo-600 font-semibold text-lg mb-6">ID Order: #{orderId}</p>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm text-center p-10 animate-scale-in">
+        <div className="w-16 h-16 bg-[#FDF0E0] rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-[#C17D3A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+          </svg>
+        </div>
+        <h2 className="font-display text-3xl font-semibold text-[#1C1A16] mb-2">Order Berhasil!</h2>
+        <p className="text-[#7A7063] text-sm mb-2">Terima kasih atas pesanan Anda.</p>
+        <p className="text-[#C17D3A] font-semibold mb-8 text-sm font-mono">#{orderId}</p>
         <button
           onClick={onClose}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold transition-colors"
+          className="w-full bg-[#C17D3A] hover:bg-[#9E6228] text-white py-3.5 rounded-xl font-medium text-sm tracking-wide transition-all hover:shadow-md"
         >
           Kembali ke Beranda
         </button>
@@ -93,103 +97,131 @@ function Checkout() {
     navigate('/')
   }
 
+  const inputClass = (field) =>
+    `w-full bg-[#FDFAF5] border rounded-xl px-4 py-3 text-sm text-[#1C1A16] placeholder-[#7A7063] focus:outline-none focus:border-[#C17D3A] focus:bg-white transition-all ${
+      errors[field] ? 'border-red-300' : 'border-[#E8E0D4]'
+    }`
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
+    <div className="min-h-screen bg-[#FDFAF5]">
+      <div className="max-w-4xl mx-auto px-6 py-10">
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Form Pengiriman */}
-        <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Informasi Pengiriman</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block">Nama Lengkap *</label>
-                <input
-                  name="fullName" value={form.fullName} onChange={handleChange}
-                  placeholder="John Doe"
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${errors.fullName ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
-              </div>
+        <h1 className="font-display text-4xl font-semibold text-[#1C1A16] mb-8 animate-fade-up" style={{ opacity: 0 }}>
+          Checkout
+        </h1>
 
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block">Email *</label>
-                <input
-                  name="email" type="email" value={form.email} onChange={handleChange}
-                  placeholder="john@example.com"
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${errors.email ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-              </div>
+        <div className="flex flex-col lg:flex-row gap-8">
 
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block">No. Telepon *</label>
-                <input
-                  name="phone" type="tel" value={form.phone} onChange={handleChange}
-                  placeholder="08123456789"
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${errors.phone ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-              </div>
+          {/* Form Pengiriman */}
+          <div className="flex-1 animate-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
+            <div className="bg-white rounded-2xl border border-[#E8E0D4] p-6">
+              <h2 className="text-xs font-semibold text-[#7A7063] uppercase tracking-[0.18em] mb-5">
+                Informasi Pengiriman
+              </h2>
 
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block">Alamat Lengkap *</label>
-                <textarea
-                  name="address" value={form.address} onChange={handleChange}
-                  placeholder="Jl. Contoh No. 123, RT 01/RW 02"
-                  rows={3}
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${errors.address ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-              </div>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
 
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block">Kota *</label>
-                <input
-                  name="city" value={form.city} onChange={handleChange}
-                  placeholder="Jakarta"
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${errors.city ? 'border-red-400' : 'border-gray-300'}`}
-                />
-                {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-              </div>
-
-              {submitError && (
-                <p className="text-red-500 text-sm">{submitError}</p>
-              )}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white py-3 rounded-lg font-semibold transition-colors mt-2"
-              >
-                {submitting ? 'Memproses...' : 'Konfirmasi Order'}
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Order Summary */}
-        <div className="lg:w-80">
-          <div className="bg-white rounded-xl shadow-md p-6 sticky top-4">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Ringkasan Order</h2>
-            <div className="divide-y divide-gray-100 mb-4">
-              {cartItems.map(item => (
-                <div key={item.id} className="py-3 flex justify-between gap-2 text-sm">
-                  <div>
-                    <p className="font-medium text-gray-800">{item.name}</p>
-                    <p className="text-gray-400">{item.quantity} × {formatRupiah(item.price)}</p>
-                  </div>
-                  <p className="font-semibold text-gray-700 whitespace-nowrap">
-                    {formatRupiah(item.price * item.quantity)}
-                  </p>
+                {/* Nama Lengkap */}
+                <div>
+                  <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Nama Lengkap *</label>
+                  <input
+                    name="fullName" value={form.fullName} onChange={handleChange}
+                    placeholder="John Doe"
+                    className={inputClass('fullName')}
+                  />
+                  {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
                 </div>
-              ))}
-            </div>
-            <div className="border-t pt-4 flex justify-between items-center">
-              <span className="font-bold text-gray-700">Total</span>
-              <span className="text-xl font-bold text-indigo-600">{formatRupiah(totalPrice)}</span>
+
+                {/* Email */}
+                <div>
+                  <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Email *</label>
+                  <input
+                    name="email" type="email" value={form.email} onChange={handleChange}
+                    placeholder="john@example.com"
+                    className={inputClass('email')}
+                  />
+                  {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                </div>
+
+                {/* No. Telepon */}
+                <div>
+                  <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">No. Telepon *</label>
+                  <input
+                    name="phone" type="tel" value={form.phone} onChange={handleChange}
+                    placeholder="08123456789"
+                    className={inputClass('phone')}
+                  />
+                  {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
+                </div>
+
+                {/* Alamat */}
+                <div>
+                  <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Alamat Lengkap *</label>
+                  <textarea
+                    name="address" value={form.address} onChange={handleChange}
+                    placeholder="Jl. Contoh No. 123, RT 01/RW 02"
+                    rows={3}
+                    className={inputClass('address')}
+                  />
+                  {errors.address && <p className="text-red-400 text-xs mt-1">{errors.address}</p>}
+                </div>
+
+                {/* Kota */}
+                <div>
+                  <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Kota *</label>
+                  <input
+                    name="city" value={form.city} onChange={handleChange}
+                    placeholder="Jakarta"
+                    className={inputClass('city')}
+                  />
+                  {errors.city && <p className="text-red-400 text-xs mt-1">{errors.city}</p>}
+                </div>
+
+                {submitError && (
+                  <p className="text-red-500 text-sm bg-red-50 border border-red-100 px-4 py-3 rounded-xl">
+                    {submitError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-[#C17D3A] hover:bg-[#9E6228] disabled:bg-[#E8E0D4] disabled:text-[#7A7063] text-white py-4 rounded-xl font-medium text-sm tracking-widest uppercase transition-all hover:shadow-md mt-2"
+                >
+                  {submitting ? 'Memproses...' : 'Konfirmasi Order'}
+                </button>
+              </form>
             </div>
           </div>
+
+          {/* Order Summary */}
+          <div className="lg:w-80 animate-fade-up" style={{ opacity: 0, animationDelay: '0.2s' }}>
+            <div className="bg-white rounded-2xl border border-[#E8E0D4] p-6 sticky top-20">
+              <h2 className="text-xs font-semibold text-[#7A7063] uppercase tracking-[0.18em] mb-4">
+                Ringkasan Order
+              </h2>
+              <div className="flex flex-col gap-3 mb-4">
+                {cartItems.map(item => (
+                  <div key={item.id} className="flex justify-between items-start gap-3 text-sm">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[#1C1A16] font-medium text-sm truncate">{item.name}</p>
+                      <p className="text-[#7A7063] text-xs mt-0.5">{item.quantity} × {formatRupiah(item.price)}</p>
+                    </div>
+                    <p className="font-semibold text-[#1C1A16] whitespace-nowrap text-sm tabular-nums">
+                      {formatRupiah(item.price * item.quantity)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-[#E8E0D4] pt-4 flex justify-between items-center">
+                <span className="text-sm text-[#7A7063]">Total</span>
+                <span className="font-display text-2xl font-semibold text-[#C17D3A] tabular-nums">
+                  {formatRupiah(totalPrice)}
+                </span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 

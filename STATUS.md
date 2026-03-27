@@ -33,6 +33,8 @@
 | FE-05 | Checkout                    | DONE        | Form validasi, order summary, modal sukses, clearCart+redirect |
 | FE-06 | Admin panel                 | DONE        | Tab produk+order, modal tambah/edit/hapus |
 | FE-07 | Integrasi API Backend       | DONE        | Checkout & Admin pakai real API; Admin login JWT; semua mock dihapus |
+| FE-08 | UI Redesign                 | DONE        | "Nusantara Luxe" — Cormorant Garamond + DM Sans, amber accent, category pills, stagger animations, build OK |
+| FE-09 | Vercel Deployment Config    | DONE        | VITE_API_URL env var di api.js, vercel.json rewrites untuk React Router, build OK |
 
 ## QA
 

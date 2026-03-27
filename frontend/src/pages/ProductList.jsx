@@ -14,7 +14,6 @@ function ProductList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Fetch products when search/category changes (debounced for search)
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchProducts()
@@ -30,9 +29,8 @@ function ProductList() {
       if (search) params.search = search
       if (category !== 'Semua') params.category = category
       const res = await getProducts(params)
-      const data = res.data
+      const data = res.data.data
       setProducts(data)
-      // rebuild category list from full fetch when no filters
       if (!search && category === 'Semua') {
         const cats = ['Semua', ...new Set(data.map(p => p.category).filter(Boolean))]
         setCategories(cats)
@@ -45,73 +43,132 @@ function ProductList() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Produk</h1>
+    <div className="min-h-screen bg-[#FDFAF5]">
+
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto px-6 pt-14 pb-10">
+        <p
+          className="text-[#C17D3A] text-xs tracking-[0.25em] uppercase font-semibold mb-4 animate-fade-up"
+          style={{ opacity: 0 }}
+        >
+          Koleksi Premium
+        </p>
+        <h1
+          className="font-display text-5xl sm:text-6xl font-semibold text-[#1C1A16] leading-[1.1] animate-fade-up"
+          style={{ opacity: 0, animationDelay: '0.1s' }}
+        >
+          Temukan Produk<br />
+          <em className="font-light italic text-[#7A7063]">Pilihan Terbaik</em>
+        </h1>
+      </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Cari produk..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        />
-        <select
-          value={category}
-          onChange={e => setCategory(e.target.value)}
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        >
-          {categories.map(c => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+      <div
+        className="max-w-6xl mx-auto px-6 mb-10 animate-fade-up"
+        style={{ opacity: 0, animationDelay: '0.2s' }}
+      >
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          {/* Search */}
+          <div className="relative max-w-xs w-full">
+            <svg
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A7063]"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Cari produk..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E8E0D4] rounded-xl text-sm text-[#1C1A16] placeholder-[#7A7063] focus:outline-none focus:border-[#C17D3A] transition-colors"
+            />
+          </div>
+
+          {/* Category Pills */}
+          <div className="flex gap-2 flex-wrap">
+            {categories.map(c => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 ${
+                  category === c
+                    ? 'bg-[#C17D3A] text-white shadow-sm'
+                    : 'bg-white border border-[#E8E0D4] text-[#7A7063] hover:border-[#C17D3A] hover:text-[#C17D3A]'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* States */}
-      {loading && (
-        <div className="text-center py-16">
-          <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-500 mt-3">Memuat produk...</p>
-        </div>
-      )}
+      <div className="max-w-6xl mx-auto px-6">
+        {loading && (
+          <div className="flex flex-col items-center py-28 gap-4">
+            <div className="w-7 h-7 border-2 border-[#C17D3A] border-t-transparent rounded-full animate-spin" />
+            <p className="text-[#7A7063] text-sm">Memuat produk...</p>
+          </div>
+        )}
 
-      {error && !loading && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4">
-          {error}
-        </div>
-      )}
+        {error && !loading && (
+          <div className="bg-red-50 border border-red-100 text-red-500 rounded-xl px-5 py-4 text-sm mb-6">
+            {error}
+          </div>
+        )}
 
-      {!loading && !error && products.length === 0 && (
-        <p className="text-gray-500 text-center py-16">Produk tidak ditemukan.</p>
-      )}
+        {!loading && !error && products.length === 0 && (
+          <div className="text-center py-28">
+            <p className="font-display text-4xl text-[#7A7063] font-light italic">Produk tidak ditemukan.</p>
+          </div>
+        )}
 
-      {/* Product Grid */}
-      {!loading && !error && products.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.map(product => (
-            <div key={product.id} className="bg-white rounded-xl shadow hover:shadow-md transition-shadow flex flex-col">
-              <div className="bg-gray-100 rounded-t-xl aspect-square flex items-center justify-center text-gray-400 text-4xl">
-                🛍️
+        {/* Product Grid */}
+        {!loading && !error && products.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 pb-20 stagger-children">
+            {products.map(product => (
+              <div
+                key={product.id}
+                className="group bg-white rounded-2xl overflow-hidden border border-[#E8E0D4] hover:border-[#C17D3A]/50 hover:shadow-xl transition-all duration-300 flex flex-col"
+              >
+                {/* Image placeholder */}
+                <div className="product-image-bg aspect-square flex items-center justify-center">
+                  <span className="text-5xl transition-transform duration-500 group-hover:scale-110 relative z-10" style={{ opacity: 0.55 }}>
+                    🛍️
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 flex flex-col flex-1 gap-1">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-[#C17D3A] font-semibold">
+                    {product.category}
+                  </span>
+                  <h2 className="text-sm font-medium text-[#1C1A16] line-clamp-2 leading-snug mt-0.5">
+                    {product.name}
+                  </h2>
+                  <p className={`text-xs mt-0.5 ${product.stock === 0 ? 'text-red-400' : 'text-[#7A7063]'}`}>
+                    {product.stock === 0 ? 'Stok habis' : `${product.stock} tersedia`}
+                  </p>
+
+                  <div className="mt-auto pt-3 flex items-center justify-between">
+                    <p className="font-display text-lg font-semibold text-[#C17D3A]">
+                      {formatRupiah(product.price)}
+                    </p>
+                    <Link
+                      to={`/products/${product.id}`}
+                      className="text-xs font-medium text-[#7A7063] hover:text-[#C17D3A] transition-colors"
+                    >
+                      Detail →
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="p-4 flex flex-col flex-1">
-                <span className="text-xs text-indigo-500 font-medium mb-1">{product.category}</span>
-                <h2 className="font-semibold text-gray-800 text-sm mb-1 line-clamp-2">{product.name}</h2>
-                <p className="text-indigo-600 font-bold mt-auto">{formatRupiah(product.price)}</p>
-                <p className={`text-xs mb-3 ${product.stock === 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                  {product.stock === 0 ? 'Stok habis' : `Stok: ${product.stock}`}
-                </p>
-                <Link
-                  to={`/products/${product.id}`}
-                  className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 rounded-lg transition-colors"
-                >
-                  Lihat Detail
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

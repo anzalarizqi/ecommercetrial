@@ -11,6 +11,8 @@ import {
 
 const EMPTY_FORM = { name: '', price: '', stock: '', category: '', description: '' }
 
+const adminInputClass = 'w-full bg-[#FDFAF5] border border-[#E8E0D4] rounded-xl px-3.5 py-2.5 text-sm text-[#1C1A16] placeholder-[#7A7063] focus:outline-none focus:border-[#C17D3A] focus:bg-white transition-all'
+
 function ProductModal({ product, token, onSaved, onClose }) {
   const [form, setForm] = useState(
     product ? { ...product, price: String(product.price), stock: String(product.stock) } : EMPTY_FORM
@@ -41,48 +43,67 @@ function ProductModal({ product, token, onSaved, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="font-bold text-gray-800">{product ? 'Edit Produk' : 'Tambah Produk'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+
+        {/* Modal Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8E0D4]">
+          <h2 className="font-display text-xl font-semibold text-[#1C1A16]">
+            {product ? 'Edit Produk' : 'Tambah Produk'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center text-[#7A7063] hover:text-[#1C1A16] hover:bg-[#F5F0E8] rounded-lg transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
+
+        {/* Modal Body */}
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Nama Produk *</label>
-            <input name="name" value={form.name} onChange={handleChange} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Nama Produk *</label>
+            <input name="name" value={form.name} onChange={handleChange} required placeholder="Nama produk" className={adminInputClass} />
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Harga (Rp) *</label>
-              <input name="price" type="number" value={form.price} onChange={handleChange} required min="0"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+              <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Harga (Rp) *</label>
+              <input name="price" type="number" value={form.price} onChange={handleChange} required min="0" placeholder="0" className={adminInputClass} />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Stok *</label>
-              <input name="stock" type="number" value={form.stock} onChange={handleChange} required min="0"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+              <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Stok *</label>
+              <input name="stock" type="number" value={form.stock} onChange={handleChange} required min="0" placeholder="0" className={adminInputClass} />
             </div>
           </div>
+
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Kategori *</label>
-            <input name="category" value={form.category} onChange={handleChange} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Kategori *</label>
+            <input name="category" value={form.category} onChange={handleChange} required placeholder="Elektronik, Fashion, dll." className={adminInputClass} />
           </div>
+
           <div>
-            <label className="text-sm text-gray-600 mb-1 block">Deskripsi</label>
-            <textarea name="description" value={form.description} onChange={handleChange} rows={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Deskripsi</label>
+            <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="Deskripsi produk..." className={adminInputClass} />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <div className="flex gap-3 justify-end pt-2">
-            <button type="button" onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50">
+
+          {error && (
+            <p className="text-red-500 text-sm bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl">{error}</p>
+          )}
+
+          <div className="flex gap-3 justify-end pt-1">
+            <button
+              type="button" onClick={onClose}
+              className="px-5 py-2.5 border border-[#E8E0D4] rounded-xl text-sm text-[#7A7063] hover:border-[#C17D3A] hover:text-[#C17D3A] transition-all"
+            >
               Batal
             </button>
-            <button type="submit" disabled={saving}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-lg font-medium">
+            <button
+              type="submit" disabled={saving}
+              className="px-5 py-2.5 bg-[#C17D3A] hover:bg-[#9E6228] disabled:bg-[#E8E0D4] disabled:text-[#7A7063] text-white rounded-xl text-sm font-medium transition-all"
+            >
               {saving ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>
@@ -113,30 +134,47 @@ function LoginForm({ onLogin }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Admin Login</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Username</label>
-            <input
-              value={username} onChange={e => setUsername(e.target.value)} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Password</label>
-            <input
-              type="password" value={password} onChange={e => setPassword(e.target.value)} required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button type="submit" disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white py-2 rounded-lg font-semibold transition-colors">
-            {loading ? 'Masuk...' : 'Masuk'}
-          </button>
-        </form>
+    <div className="min-h-screen bg-[#FDFAF5] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm animate-fade-up" style={{ opacity: 0 }}>
+
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <p className="font-display text-3xl font-semibold text-[#1C1A16] tracking-wider">
+            NUSANTARA<span className="text-[#C17D3A]">.</span>
+          </p>
+          <p className="text-xs text-[#7A7063] mt-2 tracking-[0.15em] uppercase">Admin Panel</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#E8E0D4] p-8 shadow-sm">
+          <h1 className="font-display text-2xl font-semibold text-[#1C1A16] mb-6">Masuk</h1>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Username</label>
+              <input
+                value={username} onChange={e => setUsername(e.target.value)} required
+                placeholder="admin"
+                className={adminInputClass}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-[#7A7063] mb-1.5 block tracking-wide">Password</label>
+              <input
+                type="password" value={password} onChange={e => setPassword(e.target.value)} required
+                placeholder="••••••••"
+                className={adminInputClass}
+              />
+            </div>
+            {error && (
+              <p className="text-red-500 text-sm bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl">{error}</p>
+            )}
+            <button
+              type="submit" disabled={loading}
+              className="w-full bg-[#C17D3A] hover:bg-[#9E6228] disabled:bg-[#E8E0D4] disabled:text-[#7A7063] text-white py-3 rounded-xl text-sm font-medium tracking-widest uppercase transition-all hover:shadow-md mt-1"
+            >
+              {loading ? 'Masuk...' : 'Masuk'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )
@@ -203,146 +241,176 @@ function Admin() {
 
   if (!token) return <LoginForm onLogin={handleLogin} />
 
+  const Spinner = () => (
+    <div className="flex justify-center py-20">
+      <div className="w-6 h-6 border-2 border-[#C17D3A] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Admin Panel</h1>
-        <button onClick={handleLogout}
-          className="text-sm text-gray-500 hover:text-red-500 border border-gray-300 px-3 py-1.5 rounded-lg transition-colors">
-          Logout
-        </button>
-      </div>
+    <div className="min-h-screen bg-[#FDFAF5]">
+      <div className="max-w-6xl mx-auto px-6 py-10">
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b">
-        <button
-          onClick={() => setTab('products')}
-          className={`px-5 py-2 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'products' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Daftar Produk
-        </button>
-        <button
-          onClick={() => setTab('orders')}
-          className={`px-5 py-2 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'orders' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Daftar Order
-        </button>
-      </div>
-
-      {/* Products Tab */}
-      {tab === 'products' && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-500 text-sm">{products.length} produk</p>
-            <button
-              onClick={() => setModal('add')}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              + Tambah Produk
-            </button>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8 animate-fade-up" style={{ opacity: 0 }}>
+          <div>
+            <p className="text-xs text-[#C17D3A] tracking-[0.2em] uppercase font-semibold mb-1">Dashboard</p>
+            <h1 className="font-display text-4xl font-semibold text-[#1C1A16]">Admin Panel</h1>
           </div>
-          {loadingProducts ? (
-            <div className="text-center py-16">
-              <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl shadow-md overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-gray-500">
-                  <tr>
-                    <th className="text-left px-4 py-3">Nama</th>
-                    <th className="text-left px-4 py-3">Kategori</th>
-                    <th className="text-right px-4 py-3">Harga</th>
-                    <th className="text-right px-4 py-3">Stok</th>
-                    <th className="text-center px-4 py-3">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {products.map(product => (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-800">{product.name}</td>
-                      <td className="px-4 py-3 text-gray-500">{product.category}</td>
-                      <td className="px-4 py-3 text-right text-gray-700">{formatRupiah(product.price)}</td>
-                      <td className="px-4 py-3 text-right text-gray-700">{product.stock}</td>
-                      <td className="px-4 py-3 text-center">
-                        <button onClick={() => setModal(product)}
-                          className="text-indigo-600 hover:text-indigo-800 mr-3 font-medium">
-                          Edit
-                        </button>
-                        <button onClick={() => handleDelete(product.id)}
-                          className="text-red-500 hover:text-red-700 font-medium">
-                          Hapus
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <button
+            onClick={handleLogout}
+            className="text-sm text-[#7A7063] hover:text-red-500 border border-[#E8E0D4] hover:border-red-200 px-4 py-2 rounded-xl transition-all"
+          >
+            Logout
+          </button>
         </div>
-      )}
 
-      {/* Orders Tab */}
-      {tab === 'orders' && (
-        <div>
-          {loadingOrders ? (
-            <div className="text-center py-16">
-              <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        {/* Tabs */}
+        <div
+          className="flex gap-1 mb-6 bg-white border border-[#E8E0D4] rounded-xl p-1 w-fit animate-fade-up"
+          style={{ opacity: 0, animationDelay: '0.1s' }}
+        >
+          {[['products', 'Daftar Produk'], ['orders', 'Daftar Order']].map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                tab === key
+                  ? 'bg-[#C17D3A] text-white shadow-sm'
+                  : 'text-[#7A7063] hover:text-[#1C1A16]'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Products Tab */}
+        {tab === 'products' && (
+          <div className="animate-fade-up" style={{ opacity: 0, animationDelay: '0.15s' }}>
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-[#7A7063] text-sm">{products.length} produk</p>
+              <button
+                onClick={() => setModal('add')}
+                className="bg-[#C17D3A] hover:bg-[#9E6228] text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:shadow-md flex items-center gap-2"
+              >
+                <span className="text-base leading-none">+</span>
+                Tambah Produk
+              </button>
             </div>
-          ) : (
-            <>
-              <p className="text-gray-500 text-sm mb-4">{orders.length} order</p>
-              <div className="bg-white rounded-xl shadow-md overflow-x-auto">
+
+            {loadingProducts ? <Spinner /> : (
+              <div className="bg-white rounded-2xl border border-[#E8E0D4] overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-gray-500">
-                    <tr>
-                      <th className="text-left px-4 py-3">ID Order</th>
-                      <th className="text-left px-4 py-3">Nama Pembeli</th>
-                      <th className="text-right px-4 py-3">Total</th>
-                      <th className="text-left px-4 py-3">Tanggal</th>
-                      <th className="text-left px-4 py-3">Status</th>
+                  <thead>
+                    <tr className="border-b border-[#E8E0D4]">
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Nama</th>
+                      <th className="text-left px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Kategori</th>
+                      <th className="text-right px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Harga</th>
+                      <th className="text-right px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Stok</th>
+                      <th className="text-center px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {orders.map(order => (
-                      <tr key={order.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-mono text-gray-700 text-xs">{order.id}</td>
-                        <td className="px-4 py-3 text-gray-800">{order.shippingAddress?.name || '-'}</td>
-                        <td className="px-4 py-3 text-right font-medium text-gray-800">{formatRupiah(order.total || order.totalPrice || 0)}</td>
-                        <td className="px-4 py-3 text-gray-500">{order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID') : '-'}</td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            order.status === 'completed' ? 'bg-green-100 text-green-700'
-                            : order.status === 'shipped' ? 'bg-blue-100 text-blue-700'
-                            : 'bg-yellow-100 text-yellow-700'
-                          }`}>
-                            {order.status}
+                  <tbody className="divide-y divide-[#F5F0E8]">
+                    {products.map(product => (
+                      <tr key={product.id} className="hover:bg-[#FDFAF5] transition-colors">
+                        <td className="px-5 py-3.5 font-medium text-[#1C1A16]">{product.name}</td>
+                        <td className="px-5 py-3.5">
+                          <span className="text-xs bg-[#FDF0E0] text-[#C17D3A] font-medium px-2.5 py-1 rounded-full">
+                            {product.category}
                           </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-right font-display font-semibold text-[#1C1A16] tabular-nums">
+                          {formatRupiah(product.price)}
+                        </td>
+                        <td className="px-5 py-3.5 text-right tabular-nums">
+                          <span className={product.stock === 0 ? 'text-red-400 font-medium' : 'text-[#7A7063]'}>
+                            {product.stock}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-center">
+                          <button
+                            onClick={() => setModal(product)}
+                            className="text-[#C17D3A] hover:text-[#9E6228] font-medium mr-4 text-sm transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="text-red-400 hover:text-red-600 font-medium text-sm transition-colors"
+                          >
+                            Hapus
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
-      {/* Modal */}
-      {modal !== null && (
-        <ProductModal
-          product={modal === 'add' ? null : modal}
-          token={token}
-          onSaved={() => { setModal(null); fetchProducts() }}
-          onClose={() => setModal(null)}
-        />
-      )}
+        {/* Orders Tab */}
+        {tab === 'orders' && (
+          <div className="animate-fade-up" style={{ opacity: 0, animationDelay: '0.15s' }}>
+            {loadingOrders ? <Spinner /> : (
+              <>
+                <p className="text-[#7A7063] text-sm mb-4">{orders.length} order</p>
+                <div className="bg-white rounded-2xl border border-[#E8E0D4] overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[#E8E0D4]">
+                        <th className="text-left px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">ID Order</th>
+                        <th className="text-left px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Pembeli</th>
+                        <th className="text-right px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Total</th>
+                        <th className="text-left px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Tanggal</th>
+                        <th className="text-left px-5 py-3.5 text-xs font-semibold text-[#7A7063] uppercase tracking-wide">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#F5F0E8]">
+                      {orders.map(order => (
+                        <tr key={order.id} className="hover:bg-[#FDFAF5] transition-colors">
+                          <td className="px-5 py-3.5 font-mono text-[#7A7063] text-xs">{order.id?.slice(0, 8)}…</td>
+                          <td className="px-5 py-3.5 text-[#1C1A16] font-medium">{order.shippingAddress?.name || order.customerName || '—'}</td>
+                          <td className="px-5 py-3.5 text-right font-display font-semibold text-[#1C1A16] tabular-nums">
+                            {formatRupiah(order.total || order.totalPrice || 0)}
+                          </td>
+                          <td className="px-5 py-3.5 text-[#7A7063]">
+                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID') : '—'}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              order.status === 'completed'
+                                ? 'bg-green-50 text-green-600'
+                                : order.status === 'shipped'
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'bg-[#FDF0E0] text-[#C17D3A]'
+                            }`}>
+                              {order.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Modal */}
+        {modal !== null && (
+          <ProductModal
+            product={modal === 'add' ? null : modal}
+            token={token}
+            onSaved={() => { setModal(null); fetchProducts() }}
+            onClose={() => setModal(null)}
+          />
+        )}
+
+      </div>
     </div>
   )
 }
