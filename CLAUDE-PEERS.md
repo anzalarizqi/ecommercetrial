@@ -10,14 +10,9 @@ multi-terminal Claude Code dengan claude-peers-mcp sebagai komunikasi antar agen
 
 1. Taruh file ini di root project kamu bersama PRD.md
 2. Ikuti bagian **Setup Sekali Per Mesin** jika belum pernah
-3. Ikuti bagian **Setup Per Project** setiap kali mulai project baru
-4. **Buka Supervisor dulu, sendirian.** Kamu tidak perlu tahu berapa worker yang dibutuhkan — Supervisor yang memutuskan setelah baca PRD.
-5. Supervisor akan membaca PRD, mengevaluasi apakah multi-agent worth it, dan memberitahu kamu:
-   - Berapa worker yang dibutuhkan dan role masing-masing
-   - Prompt yang harus kamu paste ke setiap terminal worker
-6. Buka terminal worker sesuai rekomendasi Supervisor, paste prompt yang dia berikan.
-7. Beritahu Supervisor bahwa workers sudah online — dia mulai assign task.
-8. Kamu jadi observer. Intervensi langsung di terminal Supervisor kalau perlu.
+3. **Buka hanya Supervisor** — satu terminal, satu paste. Selesai.
+4. Supervisor baca PRD, putuskan berapa worker, spawn terminal worker sendiri, assign task, dan kerja.
+5. Kamu jadi observer. Intervensi langsung di terminal Supervisor kalau perlu.
 
 ---
 
@@ -105,40 +100,24 @@ cd ~/projects/nama-project
 - `PRD.md` — product requirements kamu
 - `CLAUDE-PEERS.md` — file ini (sebagai referensi Supervisor)
 
-Subfolder belum perlu dibuat — biarkan Supervisor dan workers yang buat saat diperlukan.
+Subfolder belum perlu dibuat — Supervisor dan workers yang buat saat diperlukan.
 
-## 3. Buka Supervisor dulu, sendirian
-
-> Kamu tidak perlu tahu berapa worker yang dibutuhkan atau prompt apa yang harus dipaste.
-> Supervisor yang akan membaca PRD dan memberitahu kamu semua itu.
+## 3. Buka hanya Supervisor — itu saja
 
 ```bash
-cd ~/projects/nama-project
-claudepeers
-# tunggu Claude siap → paste prompt Supervisor di bawah
+cd C:\projects\nama-project
+claude --dangerously-skip-permissions --dangerously-load-development-channels server:claude-peers
+# paste prompt Supervisor di bawah
 ```
 
-Supervisor akan:
+Supervisor akan otomatis:
 1. Baca PRD dan evaluasi apakah multi-agent worth it
-2. Rekomendasikan berapa worker dan role masing-masing
-3. Generate prompt spesifik untuk setiap worker
-4. Minta approval kamu sebelum mulai
+2. Putuskan berapa worker dan role masing-masing
+3. **Spawn terminal worker sendiri** via `Start-Process`
+4. Tunggu workers online, lalu assign task langsung
+5. Kerja sampai semua task DONE
 
-## 4. Buka terminal worker sesuai rekomendasi Supervisor
-
-Setelah Supervisor memberi tahu worker apa yang dibutuhkan dan prompt-nya:
-
-```bash
-# Buka terminal baru untuk setiap worker
-cd ~/projects/nama-project/<direktori-worker>
-claudepeers
-# paste prompt yang diberikan Supervisor
-```
-
-Setelah semua worker online, beritahu Supervisor — dia akan `list_peers` dan mulai assign task.
-
-> ⚠️ Supervisor perlu workers sudah online sebelum dia bisa `list_peers`.
-> Jadi approval flow-nya: Supervisor propose → kamu buka workers → kamu konfirmasi ke Supervisor → dia mulai.
+**Kamu tidak perlu buka terminal apapun selain Supervisor.**
 
 ---
 
@@ -205,10 +184,24 @@ Cara kerja setup ini:
    - AGENTS.md : akan kamu isi dengan peer ID tiap agent setelah list_peers berhasil.
    - RESUME.md : kosong dulu — kamu isi sebelum context limit habis (lihat format di bawah).
 
-5. Jalankan list_peers. Jika belum semua worker muncul, tunggu 15 detik dan coba lagi.
+5. Spawn worker terminals secara otomatis — kamu tidak perlu minta user buka terminal.
+   Untuk setiap worker yang dibutuhkan, jalankan perintah ini (sesuaikan path dan direktori):
+
+   Windows (PowerShell):
+   Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd 'C:\full\path\to\project\<worker-dir>'; claude --dangerously-skip-permissions --dangerously-load-development-channels server:claude-peers"
+
+   Mac/Linux (bash):
+   open -a Terminal "bash -c 'cd ~/projects/nama-project/<worker-dir> && claudepeers; exec bash'"
+
+   Spawn satu per satu, tunggu ~10 detik antar spawn.
+
+6. Setelah spawn semua worker, jalankan list_peers.
+   Identifikasi tiap worker dari direktorinya (bukan dari claude-peers-mcp — itu ghost peers lama).
+   Untuk setiap worker yang ditemukan, kirim via send_message:
+   "Kamu adalah [Role] Agent. Jalankan set_summary '[Role] Agent — online' lalu tunggu task dari Supervisor."
    Catat peer ID tiap agent ke AGENTS.md.
 
-6. Sebelum mulai assign task — lapor ke user dengan:
+7. Sebelum mulai assign task — lapor ke user dengan:
    - Pemahamanmu tentang project ini
    - Penilaianmu: apakah multi-agent setup ini worth it, dan kenapa
    - Worker apa saja yang kamu rekomendasikan dan role masing-masing
@@ -375,7 +368,7 @@ Loop: check_messages → tulis/run test → update REPORT.md → lapor → check
 # TIPS & TROUBLESHOOTING
 
 **Tidak yakin perlu berapa worker?**
-Spawn dulu 2-3 worker generik, baru tanya Supervisor. Dia yang akan evaluate berdasarkan PRD dan bilang kalau ada worker yang redundant atau justru kurang.
+Tidak perlu tahu — biarkan Supervisor yang putuskan setelah baca PRD. Supervisor akan spawn worker yang dibutuhkan sendiri.
 
 **Supervisor bilang multi-agent overkill:**
 Dengerin dia. Kalau PRD-nya kecil atau task-nya sangat sequential, single Claude Code session memang lebih efisien dan lebih sedikit error. Multi-agent paling worth it kalau ada minimal 2 domain yang benar-benar bisa jalan paralel tanpa overlap file.
