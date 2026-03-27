@@ -11,10 +11,13 @@ multi-terminal Claude Code dengan claude-peers-mcp sebagai komunikasi antar agen
 1. Taruh file ini di root project kamu bersama PRD.md
 2. Ikuti bagian **Setup Sekali Per Mesin** jika belum pernah
 3. Ikuti bagian **Setup Per Project** setiap kali mulai project baru
-4. Spawn workers dulu, baru Supervisor
-5. Paste prompt Supervisor — dia akan baca PRD, evaluasi apakah multi-agent worth it, suggest worker yang diperlukan, lalu minta approval kamu
-6. Kamu approve atau koreksi rencananya, baru dia eksekusi
-7. Kamu jadi observer. Intervensi langsung di terminal Supervisor kalau perlu.
+4. **Buka Supervisor dulu, sendirian.** Kamu tidak perlu tahu berapa worker yang dibutuhkan — Supervisor yang memutuskan setelah baca PRD.
+5. Supervisor akan membaca PRD, mengevaluasi apakah multi-agent worth it, dan memberitahu kamu:
+   - Berapa worker yang dibutuhkan dan role masing-masing
+   - Prompt yang harus kamu paste ke setiap terminal worker
+6. Buka terminal worker sesuai rekomendasi Supervisor, paste prompt yang dia berikan.
+7. Beritahu Supervisor bahwa workers sudah online — dia mulai assign task.
+8. Kamu jadi observer. Intervensi langsung di terminal Supervisor kalau perlu.
 
 ---
 
@@ -97,37 +100,45 @@ mkdir -p ~/projects/nama-project
 cd ~/projects/nama-project
 ```
 
-Buat subfolder sesuai domain agent yang kamu rencanakan. Contoh:
-```bash
-mkdir -p frontend backend tests
-# atau
-mkdir -p src infrastructure docs
-# sesuaikan dengan project kamu
-```
-
 ## 2. Taruh file-file ini di root project
 
 - `PRD.md` — product requirements kamu
 - `CLAUDE-PEERS.md` — file ini (sebagai referensi Supervisor)
 
-## 3. Spawn terminal workers DULU, Supervisor TERAKHIR
+Subfolder belum perlu dibuat — biarkan Supervisor dan workers yang buat saat diperlukan.
 
-> ⚠️ Urutan ini penting. Supervisor perlu workers sudah online saat dia `list_peers`.
-> Spawn dulu worker yang kamu perkirakan dibutuhkan — Supervisor akan konfirmasi atau koreksi setelah baca PRD.
+## 3. Buka Supervisor dulu, sendirian
 
-Untuk setiap worker:
-```bash
-cd ~/projects/nama-project/<direktori-worker>
-claudepeers
-# tunggu Claude siap → paste prompt worker yang sesuai
-```
+> Kamu tidak perlu tahu berapa worker yang dibutuhkan atau prompt apa yang harus dipaste.
+> Supervisor yang akan membaca PRD dan memberitahu kamu semua itu.
 
-Terakhir, spawn Supervisor:
 ```bash
 cd ~/projects/nama-project
 claudepeers
 # tunggu Claude siap → paste prompt Supervisor di bawah
 ```
+
+Supervisor akan:
+1. Baca PRD dan evaluasi apakah multi-agent worth it
+2. Rekomendasikan berapa worker dan role masing-masing
+3. Generate prompt spesifik untuk setiap worker
+4. Minta approval kamu sebelum mulai
+
+## 4. Buka terminal worker sesuai rekomendasi Supervisor
+
+Setelah Supervisor memberi tahu worker apa yang dibutuhkan dan prompt-nya:
+
+```bash
+# Buka terminal baru untuk setiap worker
+cd ~/projects/nama-project/<direktori-worker>
+claudepeers
+# paste prompt yang diberikan Supervisor
+```
+
+Setelah semua worker online, beritahu Supervisor — dia akan `list_peers` dan mulai assign task.
+
+> ⚠️ Supervisor perlu workers sudah online sebelum dia bisa `list_peers`.
+> Jadi approval flow-nya: Supervisor propose → kamu buka workers → kamu konfirmasi ke Supervisor → dia mulai.
 
 ---
 
